@@ -343,7 +343,7 @@ Return ONLY the corrected text. No explanations, comments, or alternatives.`
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header">
-              <h3>Gmail AI Assistant <a href="https://princekhunt16.github.io/PortfolioWebsite/" target="_blank" rel="noopener noreferrer">- Prince K</a></h3>
+              <h3>Gmail AI Assistant </h3>
               <button
                 className="close-btn"
                 onClick={() => setIsOpen(false)}
