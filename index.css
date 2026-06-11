@@ -1,0 +1,743 @@
+@font-face {
+    font-family: "AdobeClean";
+    src: url("/fonts/AdobeClean.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+#gmail-ai-assistant-container {
+    --bg: #ffffff;
+    --overlay-bg: rgba(0, 0, 0, 0.35);
+
+    --modal-bg: #ffffff;
+    --panel-bg: #f6f7f9;
+    --panel-contrast: #ffffff;
+
+    --border: #1f293350;
+    /* Dark but not harsh black */
+    --floating-border: #1f293350;
+
+    --text: #0b0f14;
+    /* Slightly softer than pure black */
+    --text-secondary: #4b5563;
+    --muted: #6b7280;
+
+    --accent: #e5e7eb;
+
+    --button-bg: #f3f4f6;
+    --button-border: #1f2933;
+    --button-hover: #e5e7eb;
+
+    --floating-bg: #ffffff;
+
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+    /* Reset for container and children */
+    &,
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .modal-overlay {
+        font-family: 'AdobeClean' !important;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale !important;
+    }
+
+    .modal-overlay input,
+    textarea,
+    select,
+    button,
+    optgroup,
+    option {
+        font-family: 'AdobeClean' !important;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale !important;
+    }
+
+    .floating-button {
+        position: fixed;
+        width: 60px;
+        height: 60px;
+        background: var(--floating-bg);
+        border: 1px solid var(--floating-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        z-index: 10000;
+        transition: all 0.3s ease;
+        user-select: none;
+        overflow: hidden;
+        color: var(--text);
+    }
+
+    .floating-button:hover {
+        transform: scale(1.1);
+        background: var(--button-hover);
+        border-color: var(--button-border);
+        box-shadow: 0 6px 20px var(--shadow);
+    }
+
+    .floating-button.dragging {
+        cursor: grabbing;
+        transform: scale(1.05);
+    }
+
+    .floating-button .icon {
+        width: 24px;
+        height: 24px;
+        color: var(--text-secondary);
+        z-index: 100;
+        font-size: 16px;
+    }
+
+    .floating-button::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+
+        /* The gradient that will spin */
+        background: conic-gradient(#ff0077 0%,
+                /* Pink/Red */
+                #00ffff 30%,
+                /* Cyan */
+                #ff0077 50%,
+                /* Pink/Red */
+                #00ffff 80%,
+                /* Cyan */
+                #ff0077 100%);
+
+        z-index: -1;
+        /* Place behind the button content */
+        animation: rotate 4s linear infinite;
+        /* Apply the animation */
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Optional: To make the button itself visible, you'll need a background. 
+     Otherwise, the gradient will fill the whole button. */
+    .floating-button {
+        /* ... other styles ... */
+        background-color: var(--bg);
+        /* Example: Dark background for the button */
+        border-radius: 50%;
+        /* If your button is circular */
+    }
+
+    /* Optional: To create a distinct 'border' look, you can use a second pseudo-element 
+     or an inner shadow to mask the rotating gradient. Here's a simpler mask method: */
+
+    .floating-button::after {
+        content: '';
+        position: absolute;
+        top: 3px;
+        /* Adjust this value to control the border thickness */
+        left: 3px;
+        /* Adjust this value to control the border thickness */
+        right: 3px;
+        bottom: 3px;
+        background: var(--bg);
+        /* Must match or blend with the button's intended background */
+        border-radius: inherit;
+        /* Inherit the button's shape */
+        z-index: 0;
+        /* Above the ::before (gradient) but below the button content (z-index 1) */
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--overlay-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10001;
+        padding: 20px;
+    }
+
+    /* Modal */
+    .modal {
+        background: var(--modal-bg);
+        border: 2px solid black;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        max-width: 70vw;
+        width: 100%;
+        max-height: 80vh;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: modalSlideIn 0.3s ease;
+        font-family: 'AdobeClean', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #e0e0e0;
+        border-radius: 30px;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel-contrast);
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        color: var(--text);
+        font-size: 20px;
+        font-weight: 600;
+        font-family: "AdobeClean";
+    }
+
+    .close-btn {
+        background: var(--button-bg);
+        border: 1px solid var(--button-border);
+        cursor: pointer;
+        padding: 8px;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+    }
+
+    .close-btn:hover {
+        background: var(--button-hover);
+    }
+
+    .close-btn .icon {
+        width: 20px;
+        height: 20px;
+        color: var(--text);
+    }
+
+    /* Modal Body - New Layout */
+    .modal-body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 240px;
+        background: var(--panel-bg);
+        border-right: 2px solid var(--border);
+        padding: 16px 0;
+        overflow-y: auto;
+    }
+
+    .sidebar-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text-secondary);
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+        font-family: "AdobeClean";
+    }
+
+    .sidebar-item:hover {
+        background: var(--panel-contrast);
+        color: var(--text);
+    }
+
+    .sidebar-item.active {
+        background: var(--panel-contrast);
+        color: var(--text);
+        border-left-color: var(--button-border);
+    }
+
+    .sidebar-item .icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    /* Content Area */
+    .content-area {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+        background: var(--modal-bg);
+    }
+
+    .content-header {
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .content-header h2 {
+        margin: 0 0 8px 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
+        font-family: "AdobeClean";
+    }
+
+    .content-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        font-family: "AdobeClean";
+    }
+
+    /* Grammar Section */
+    .grammar-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .input-group label {
+        font-weight: 500;
+        color: var(--text);
+        font-size: 15px;
+        font-family: "AdobeClean";
+    }
+
+    .input-group textarea,
+    .input-group input {
+        padding: 12px;
+        max-width: calc(100% - 30px);
+        border: 1px solid var(--border);
+        background: var(--panel-contrast);
+        color: var(--text);
+        font-size: 15px;
+        font-family: 'AdobeClean', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        resize: vertical;
+        width: 100%;
+        border-radius: 13px;
+    }
+
+    .input-group textarea:focus,
+    .input-group input:focus {
+        outline: none;
+        border-color: var(--button-border);
+        background: var(--panel-contrast);
+    }
+
+    .input-group textarea {
+        min-height: 250px;
+    }
+
+    .process-btn,
+    .add-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: var(--button-bg);
+        color: var(--text);
+        border: 1px solid var(--button-border);
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        margin-top: 8px;
+        align-self: flex-start;
+        border-radius: 13px;
+    }
+
+    .process-btn:hover:not(:disabled),
+    .add-btn:hover:not(:disabled) {
+        background: var(--button-hover);
+        border-color: var(--button-border);
+    }
+
+    .process-btn:disabled,
+    .add-btn:disabled {
+        background: var(--panel-bg);
+        border-color: var(--border);
+        color: var(--muted);
+        cursor: not-allowed;
+    }
+
+    .process-btn .icon,
+    .add-btn .icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .spinning {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .error-message {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        background: var(--panel-contrast);
+        border: 1px solid #fca5a5;
+        color: var(--text);
+        font-size: 15px;
+        font-family: "AdobeClean";
+        border-radius: 13px;
+    }
+
+    .error-message .icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .result-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        background: var(--panel-contrast);
+        border: 1px solid var(--border);
+    }
+
+    .result-group label {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 15px;
+        font-family: "AdobeClean";
+    }
+
+    .result-text {
+        padding: 12px;
+        background: var(--modal-bg);
+        border: 1px solid var(--border);
+        font-size: 15px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        color: var(--text);
+        font-family: "AdobeClean";
+        border-radius: 13px;
+    }
+
+    .copy-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: var(--button-bg);
+        color: var(--text);
+        border: 1px solid var(--button-border);
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        align-self: flex-start;
+        font-family: "AdobeClean";
+        border-radius: 13px;
+    }
+
+    .copy-btn:hover {
+        background: var(--button-hover);
+        border-color: var(--button-border);
+    }
+
+    .copy-btn .icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Storage Section */
+    .storage-section {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .add-message {
+        padding: 16px;
+        background: var(--panel-contrast);
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        border-radius: 20px;
+    }
+
+    .add-message h4 {
+        margin: 0 0 16px 0;
+        color: var(--text);
+        font-size: 18px;
+        font-weight: 600;
+        font-family: 'AdobeClean';
+    }
+
+    .messages-list h4 {
+        margin: 0 0 16px 0;
+        color: var(--text);
+        font-size: 18px;
+        font-weight: 600;
+        font-family: 'AdobeClean';
+    }
+
+    .no-messages {
+        text-align: center;
+        color: var(--muted);
+        font-style: italic;
+        padding: 40px 20px;
+        background: var(--panel-contrast);
+        border: 1px solid var(--border);
+        font-family: 'AdobeClean';
+        border-radius: 20px;
+    }
+
+    .messages {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .message-item {
+        border: 1px solid var(--border);
+        padding: 16px;
+        background: var(--panel-contrast);
+        transition: border-color 0.15s;
+        font-family: 'AdobeClean';
+        border-radius: 13px;
+    }
+
+    .message-item:hover {
+        border-color: var(--button-border);
+    }
+
+    .message-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-family: 'AdobeClean';
+    }
+
+    .message-header strong {
+        color: var(--text);
+        font-size: 15px;
+    }
+
+    .delete-btn {
+        background: var(--button-bg);
+        border: 1px solid var(--button-border);
+        cursor: pointer;
+        padding: 6px;
+        transition: background 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+    }
+
+    .delete-btn:hover {
+        background: var(--button-hover);
+    }
+
+    .delete-btn .icon {
+        width: 16px;
+        height: 16px;
+        color: var(--muted);
+    }
+
+    .message-content {
+        font-size: 15px;
+        color: var(--muted);
+        line-height: 1.5;
+        margin-bottom: 12px;
+        white-space: pre-wrap;
+        font-family: 'AdobeClean';
+    }
+
+    /* Scrollbar Styling */
+    .content-area::-webkit-scrollbar,
+    .sidebar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .content-area::-webkit-scrollbar-track,
+    .sidebar::-webkit-scrollbar-track {
+        background: var(--panel-contrast);
+    }
+
+    .content-area::-webkit-scrollbar-thumb,
+    .sidebar::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border: 1px solid var(--panel-contrast);
+    }
+
+    .content-area::-webkit-scrollbar-thumb:hover,
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: var(--button-border);
+    }
+
+    /* Selected Text Banner */
+    .selected-text-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        margin-bottom: 16px;
+        color: var(--text-secondary);
+        font-size: 15px;
+        border-radius: 13px;
+    }
+
+    .selected-text-banner .icon {
+        width: 18px;
+        height: 18px;
+        color: #888;
+        flex-shrink: 0;
+    }
+
+    .selected-text-banner span {
+        flex: 1;
+        font-family: 'AdobeClean';
+    }
+
+    .import-btn {
+        padding: 8px 16px;
+        background: var(--button-bg);
+        color: var(--text);
+        border: 1px solid var(--button-border);
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+        border-radius: 13px;
+    }
+
+    .import-btn:hover {
+        background: var(--button-hover);
+        border-color: var(--button-border);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .modal {
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+
+        .modal-body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .sidebar-item {
+            flex: 1;
+            min-width: 120px;
+            border-left: none;
+            border-bottom: 3px solid transparent;
+            justify-content: center;
+        }
+
+        .sidebar-item.active {
+            border-left: none;
+            border-bottom-color: var(--button-border);
+        }
+
+        .content-area {
+            padding: 16px;
+        }
+
+        .content-header h2 {
+            font-size: 24px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .floating-button {
+            width: 50px;
+            height: 50px;
+        }
+
+        .floating-button .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-header {
+            padding: 16px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+        }
+
+        .sidebar-item {
+            font-size: 18px;
+            padding: 12px 16px;
+        }
+
+        .sidebar-item .icon {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}

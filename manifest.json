@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Gmail AI Assistant",
+  "version": "2.0.3",
+  "description": "AI-powered Gmail extension with generate mail, grammar correction and message storage.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "js": [
+        "src/content.jsx"
+      ],
+      "css": [
+        "src/index.css"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/*",
+        "src/index.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; font-src 'self' https://fonts.gstatic.com;object-src 'self'; script-src-elem 'self' 'unsafe-inline'"
+  },
+  "action": {
+    "default_popup": "index.html"
+  }
+}
