@@ -85,7 +85,7 @@ The assistant appears as an interactive panel inside Gmail, enabling real-time e
 ### Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/dikshaforsure/Gmail-AI-Assistant-ChromeExtension
 cd Gmail-AI-Assistant-Chrome-Extension
 ```
 
